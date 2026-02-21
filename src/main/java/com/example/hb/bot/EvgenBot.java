@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -108,8 +109,14 @@ public class EvgenBot extends TelegramLongPollingBot {
     }
 
     private void handleStart(Long chatId, String fullName) throws TelegramApiException {
-        // Логируем chatId для настройки предзагрузки
         log.info("User started bot. Chat ID: {} (use this for telegram.preload.chatId in application.properties)", chatId);
+
+        // Убираем старую клавиатуру, чтобы отобразились только актуальные кнопки
+        SendMessage removeKeyboard = new SendMessage();
+        removeKeyboard.setChatId(chatId.toString());
+        removeKeyboard.setText("Обновляю меню…");
+        removeKeyboard.setReplyMarkup(new ReplyKeyboardRemove(true));
+        execute(removeKeyboard);
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
@@ -159,14 +166,23 @@ public class EvgenBot extends TelegramLongPollingBot {
         // 2. Проверяем кэш File ID (быстрая отправка)
         String cachedFileId = fileIdCacheService.getFileId(mediaPath);
         if (cachedFileId != null && !cachedFileId.isEmpty()) {
-            log.info("Using cached File ID for congratulations");
-            sendMediaByFileId(chatId, cachedFileId, isVideo);
-            return;
+            try {
+                log.info("Using cached File ID for congratulations");
+                sendMediaByFileId(chatId, cachedFileId, isVideo);
+                return;
+            } catch (TelegramApiException e) {
+                if (e.getMessage() != null && e.getMessage().contains("wrong file identifier")) {
+                    log.warn("Cached File ID invalid for {}, re-uploading", mediaPath);
+                    fileIdCacheService.removeFileId(mediaPath);
+                } else {
+                    throw e;
+                }
+            }
         }
         
-        // 3. Если File ID нет, загружаем файл и кэшируем (только первый раз)
+        // 3. Если File ID нет или кэш невалидный — загружаем файл с диска
         if (fileIdCacheService.fileExists(mediaPath)) {
-            log.info("Uploading file for congratulations (first time), will cache File ID");
+            log.info("Uploading file for congratulations, will cache File ID");
             
             // Отправляем уведомление о загрузке
             SendMessage loadingMessage = new SendMessage();
@@ -216,14 +232,23 @@ public class EvgenBot extends TelegramLongPollingBot {
         // 2. Проверяем кэш File ID (быстрая отправка)
         String cachedFileId = fileIdCacheService.getFileId(mediaPath);
         if (cachedFileId != null && !cachedFileId.isEmpty()) {
-            log.info("Using cached File ID for monopoly");
-            sendMediaByFileId(chatId, cachedFileId, isVideo);
-            return;
+            try {
+                log.info("Using cached File ID for monopoly");
+                sendMediaByFileId(chatId, cachedFileId, isVideo);
+                return;
+            } catch (TelegramApiException e) {
+                if (e.getMessage() != null && e.getMessage().contains("wrong file identifier")) {
+                    log.warn("Cached File ID invalid for {}, re-uploading", mediaPath);
+                    fileIdCacheService.removeFileId(mediaPath);
+                } else {
+                    throw e;
+                }
+            }
         }
         
-        // 3. Если File ID нет, загружаем файл и кэшируем (только первый раз)
+        // 3. Если File ID нет или кэш невалидный — загружаем файл с диска
         if (fileIdCacheService.fileExists(mediaPath)) {
-            log.info("Uploading file for monopoly (first time), will cache File ID");
+            log.info("Uploading file for monopoly, will cache File ID");
             
             // Отправляем уведомление о загрузке
             SendMessage loadingMessage = new SendMessage();

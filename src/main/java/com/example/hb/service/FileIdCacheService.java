@@ -47,6 +47,16 @@ public class FileIdCacheService {
     }
 
     /**
+     * Удалить File ID из кэша (например, если идентификатор устарел)
+     */
+    public void removeFileId(String filePath) {
+        if (cache.remove(filePath) != null) {
+            saveCache();
+            log.info("Removed invalid File ID from cache for: {}", filePath);
+        }
+    }
+
+    /**
      * Проверить, есть ли File ID в кэше
      */
     public boolean hasFileId(String filePath) {
