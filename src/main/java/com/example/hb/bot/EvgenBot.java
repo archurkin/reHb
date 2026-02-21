@@ -77,9 +77,9 @@ public class EvgenBot extends TelegramLongPollingBot {
                         handleJoke(chatId);
                     } else if (text.equals("✅ Меню")) {
                         handleMenu(chatId);
-                    } else if (text.equals("🎉 Поздравление")) {
+                    } else if (text.equals("малышка оторва")) {
                         handleCongratulations(chatId);
-                    } else if (text.equals("🎲 Создание монополии")) {
+                    } else if (text.equals("шанель номер 1")) {
                         handleMonopoly(chatId);
                     }
                 }
@@ -404,10 +404,10 @@ public class EvgenBot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        // Только две кнопки: Поздравление и Создание монополии
+        // Кнопки: малышка оторва, шанель номер 1
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton("🎉 Поздравление"));
-        row1.add(new KeyboardButton("🎲 Создание монополии"));
+        row1.add(new KeyboardButton("малышка оторва"));
+        row1.add(new KeyboardButton("шанель номер 1"));
         keyboard.add(row1);
 
         keyboardMarkup.setKeyboard(keyboard);
