@@ -51,14 +51,12 @@ public class BotRegistrationRunner implements ApplicationRunner {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(evgenBot);
             log.info("Telegram bot successfully registered");
-            
-            // Предзагрузка файлов в фоновом режиме
             if (preloadEnabled) {
                 preloadMediaFiles();
             }
         } catch (TelegramApiException e) {
-            log.error("Failed to register Telegram bot", e);
-            throw new RuntimeException("Failed to register Telegram bot", e);
+            log.error("Failed to register Telegram bot (app will keep running, set TELEGRAM_BOT_TOKEN if deploying): {}", e.getMessage());
+            // Не падаем — чтобы веб-сервер поднялся и healthcheck прошёл
         }
     }
 
