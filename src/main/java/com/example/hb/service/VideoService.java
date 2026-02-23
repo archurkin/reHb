@@ -19,7 +19,6 @@ public class VideoService {
     @Value("${telegram.video.monopoly:}")
     private String monopolyVideoFileId;
 
-    // Пути к локальным файлам в resources
     @Value("${telegram.media.congratulations.path:media/congratulations.mp4}")
     private String congratulationsMediaPath;
 

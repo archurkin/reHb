@@ -1,0 +1,16 @@
+# Конфиг для деплоя на Railway
+# https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Путь для проверки жизни — должен возвращать 200
+healthcheckPath = "/health"
+# Таймаут перед первой проверкой (секунды)
+healthcheckTimeout = 30
+# Порту Railway задаёт сам через переменную PORT
+startCommand = "java -jar app.jar"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
