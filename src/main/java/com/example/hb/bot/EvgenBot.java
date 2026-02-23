@@ -70,16 +70,16 @@ public class EvgenBot extends TelegramLongPollingBot {
 
                 // Обработка текстовых сообщений
                 if (message.hasText()) {
-                    String text = message.getText();
+                    String text = message.getText().trim();
                     if (text.equals("/start")) {
                         handleStart(chatId, fullName);
                     } else if (text.equals("😛 Анекдот")) {
                         handleJoke(chatId);
                     } else if (text.equals("✅ Меню")) {
                         handleMenu(chatId);
-                    } else if (text.equals("малышка оторва")) {
+                    } else if (text.equals("малышка оторва") || text.equals("🎉 Поздравление")) {
                         handleCongratulations(chatId);
-                    } else if (text.equals("шанель номер 1")) {
+                    } else if (text.equals("шанель номер 1") || text.equals("🎲 Создание монополии")) {
                         handleMonopoly(chatId);
                     }
                 }
